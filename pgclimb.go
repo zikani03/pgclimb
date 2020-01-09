@@ -251,6 +251,11 @@ func main() {
 					Value: "data",
 					Usage: "table name",
 				},
+				cli.StringFlag{
+					Name:  "on-conflict",
+					Value: "",
+					Usage: "e.g. 'id NO ACTION'",
+				},
 			},
 			Action: func(c *cli.Context) error {
 				format, err := formats.NewInsertsFormat(
@@ -258,6 +263,7 @@ func main() {
 					c.GlobalString("output"),
 					c.String("table"),
 				)
+				format.OnConflict = c.String("on-conflict")
 				exitOnError(err)
 				exportFormat(c, format)
 				return nil

@@ -31,6 +31,8 @@ type InsertsFormat struct {
 	columns     []string
 	multiInsert bool
 	writer      *bufio.Writer
+
+	OnConflict  string
 }
 
 func NewInsertsFormat(w io.Writer, fileName string, tableName string) (*InsertsFormat, error) {
@@ -78,7 +80,14 @@ func (f *InsertsFormat) WriteRow(values map[string]interface{}) error {
 	}
 	buf.WriteString("VALUES (")
 	buf.WriteString(strings.Join(record, ","))
-	buf.WriteString(");\n")
+	buf.WriteString(") ")
+	
+	if f.OnConflict != "" {
+		buf.WriteString(" ON CONFLICT ")
+		buf.WriteString(f.OnConflict) 
+	}
+
+	buf.WriteString(";\n")
 
 	_, err := f.writer.Write(buf.Bytes())
 	if err != nil {
